@@ -1,6 +1,7 @@
 import model.*;
 import helper.*;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 public class Puzzle {
     private static int size;
@@ -9,13 +10,14 @@ public class Puzzle {
     private static int model = 1; // 1: snail 2: row
     private static boolean isTime = false;
     private static int timeout = -1; // seconds
-    private static Calendar startTime;
-    private static Calendar endTime;
+    private static long startTime;
+    private static long endTime;
     private static Node goal;
     private static int sizeComplexity = 0;
     private static int timeComplexity = 1;
     private static List<Node> closedList = new ArrayList<>();
     private static PriorityQueue<Node> openList = new PriorityQueue<>();
+    private static Semaphore semaphore = new Semaphore(1);
 
     private static void updateSizeComplexity(){
         if(openList.size() + closedList.size() > sizeComplexity)
@@ -23,8 +25,11 @@ public class Puzzle {
     }
 
     private static void outputTime(){
-        System.out.println("Start time     : " + startTime.getTime());
-        System.out.println("End time       : " + endTime.getTime());
+        System.out.println("Taken time     : " + 
+        (endTime - startTime) / 1000 +
+        " secondes and " +
+        (endTime - startTime) % 1000 +
+        " millisecondes");
     }
 
     private static void outputSequence(Node node){
@@ -39,13 +44,20 @@ public class Puzzle {
     }
 
     private static void end(Node end){
-        System.out.println("Final state reached");
-        outputTime();
-        System.out.println("Time complexity: " + timeComplexity);
-        System.out.println("Size complexity: " + sizeComplexity);
-        System.out.println("Nb move:         " + end.g);
-        System.out.println("Squence:         ");
-        outputSequence(end);
+        try {
+            semaphore.acquire();
+            System.out.println("Final state reached");
+            outputTime();
+            System.out.println("Time complexity: " + timeComplexity);
+            System.out.println("Size complexity: " + sizeComplexity);
+            System.out.println("Nb move:         " + end.g);
+            System.out.println("Squence:         ");
+            outputSequence(end);
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+        
+        System.exit(0);
     }
 
     private static Node getSmallerNode(){
@@ -79,7 +91,6 @@ public class Puzzle {
     private static void addNodeToList(Node node){
         if(!closedList.contains(node)){
             openList.add(node);
-            ++timeComplexity;
         }
     }
 
@@ -93,13 +104,18 @@ public class Puzzle {
     
     private static void resolve(){
         boolean solvable = false;
-        startTime = Calendar.getInstance();
+        startTime = System.currentTimeMillis();
+        if(isTime){
+            Thread tc = new Thread(new TimeChecker(timeout, semaphore));
+            tc.start();
+        }
         while(openList.size() != 0){
             Node node = getSmallerNode();
             closedList.add(node);
             updateSizeComplexity();
+            ++timeComplexity;
             if(node.compareWith(goal) == 0){
-                endTime = Calendar.getInstance();
+                endTime = System.currentTimeMillis();
                 end(node);
                 solvable = true;
                 break;
