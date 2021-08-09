@@ -5,7 +5,7 @@ import java.util.concurrent.Semaphore;
 
 public class Puzzle {
     private static int size;
-    private static int heuristic; // 1: manathan 2: euclidian 3: tiles out of place
+    private static int heuristic; // 1: Manhattan 2: Euclidean 3: Tiles out of place
     private static int type = 1; // 1: greedy 2: uniform
     private static int model = 1; // 1: snail 2: row
     private static boolean isTime = false;
@@ -29,7 +29,7 @@ public class Puzzle {
         (endTime - startTime) / 1000 +
         " secondes and " +
         (endTime - startTime) % 1000 +
-        " millisecondes");
+        " milli secondes");
     }
 
     private static void outputSequence(Node node){
@@ -51,7 +51,7 @@ public class Puzzle {
             System.out.println("Time complexity: " + timeComplexity);
             System.out.println("Size complexity: " + sizeComplexity);
             System.out.println("Nb move:         " + end.g);
-            System.out.println("Squence:         ");
+            System.out.println("Sequence:         ");
             outputSequence(end);
         } catch(Exception e){
             System.out.println(e.getMessage());
@@ -134,16 +134,16 @@ public class Puzzle {
         if (args.length != 2 && args.length != 3 && args.length != 4 && args.length != 5){
             throw new Exception("The programe need two args: <File> <heuristic> <type> <model> <timeout>\n" +
                                 "\theuristic:\n" +
-                                "\t     1: manathan\n" +
-                                "\t     2: euclidian\n" +
-                                "\t     3: tiles out of place\n" +
-                                "\t     4: random\n" +
+                                "\t     1: Manhattan\n" +
+                                "\t     2: Euclidean\n" +
+                                "\t     3: Tiles out of place\n" +
+                                "\t     4: Random\n" +
                                 "\ttype:\n" +
-                                "\t     1: greedy\n" +
-                                "\t     2: uniform\n" +
+                                "\t     1: Greedy\n" +
+                                "\t     2: Uniform\n" +
                                 "\tmodel:\n" +
-                                "\t     1: snail\n" +
-                                "\t     2: row\n" +
+                                "\t     1: Snail\n" +
+                                "\t     2: Row\n" +
                                 "\ttimeout:\n" +
                                 "\t     seconds\n"
                                 );
